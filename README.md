@@ -2,9 +2,6 @@
 
 Spinner difficulty calculator for osu!, created by [TheJorgeMC](https://osu.ppy.sh/users/TheJorgeMC).
 
-![Preview](docs/vista_previa.png)
-<sub>Preview with sample data.</sub>
-
 ## What does it do?
 
 - Calculates a beatmap's max score with any mod combination.
