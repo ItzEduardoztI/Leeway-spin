@@ -193,7 +193,7 @@ class Beatmap:
     def info(self):
         m = self.meta
         return dict(title=m.get("Title", "?"), artist=m.get("Artist", "?"), version=m.get("Version", "?"),
-                    creator=m.get("Creator", "?"), hp=self.hp, cs=self.cs, od=self.od,
+                    creator=m.get("Creator", "?"), hp=round(self.hp, 2), cs=round(self.cs, 2), od=round(self.od, 2),
                     objects=len(self.objs), spinners=len(self.spinners()),
                     drain=max(0, self.drain_ms() // 1000))
 

@@ -88,7 +88,7 @@ def fetch_map(bid):
                 _maps[bid] = (time.time(), txt); return txt
         except Exception as e:
             err = e
-    raise ValueError("No pude descargar el mapa %d (%s). Prueba subiendo el archivo .osu." % (bid, err))
+    raise ValueError("No pude descargar el mapa %d (%s)." % (bid, err))
 
 
 def parse_v2(s, rank):
@@ -140,7 +140,7 @@ def analyze(req, sess):
         if len(text) > 3_000_000: raise ValueError("El archivo .osu es demasiado grande.")
     else:
         m = re.search(r"osu/(\d+)", q) or re.search(r"/b/(\d+)", q) or re.match(r"^\s*(\d+)", q)
-        if not m: raise ValueError("Escribe un ID o un link de beatmap (o sube un archivo .osu).")
+        if not m: raise ValueError("ID o link de beatmap no válido.")
         bid = int(m.group(1))
         tail = re.search(r"([A-Za-z]+)$", q)
         if tail and not mods_in: mods_in = tail.group(1).upper()
@@ -153,16 +153,19 @@ def analyze(req, sess):
     out = dict(map=bm.info(), beatmap_id=bid, mods=mods_str(mods), auto=auto, max_score=bm.max_score(mods),
                spinners=bm.spinner_table(mods), players=[], me_score=None, warning=None)
     if not bid: out["warning"] = "Sin ID de beatmap no se puede cargar el ranking."
-    elif not CONFIGURED: out["warning"] = "Este servidor no tiene configurada la API de osu!, por eso no hay ranking."
+    elif not CONFIGURED: out["warning"] = "Ranking no disponible por ahora."
     else:
         try:
             out["players"] = [decorate(bm, p) for p in top_scores(bid)]
-            if not out["players"]: out["warning"] = "Este mapa no tiene scores en el ranking (o no es rankeado/loved)."
+            if not out["players"]: out["warning"] = "Este mapa no tiene scores en el ranking."
         except Exception as e:
-            out["warning"] = "No pude leer el ranking de osu! (%s)." % e
+            out["warning"] = "Ranking no disponible (%s)." % e
         if sess:
-            ms = my_score(bid, sess)
-            if ms: out["me_score"] = decorate(bm, ms)
+            mine = [p for p in out["players"] if p.get("uid") == str(sess["id"])]
+            if mine: mine[0]["is_me"] = True
+            else:
+                ms = my_score(bid, sess)
+                if ms: out["me_score"] = decorate(bm, ms)
     return out
 
 
