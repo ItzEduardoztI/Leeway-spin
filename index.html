@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leeway Calculator</title>
+<style>
+:root{--bg:#18141d;--card:#241e2c;--card2:#2d2536;--line:#3a3046;--tx:#f3eef8;--mut:#a99bb8;--pink:#ff66aa;--ok:#5be58a;--bad:#ff6b6b;--over:#ffd35c;--na:#7d7189}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 400px at 15% -10%,#3b1f4d55,transparent),var(--bg);color:var(--tx);font:15px/1.45 "Segoe UI",system-ui,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:22px 16px 60px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.logo{width:42px;height:42px;border-radius:50%;background:conic-gradient(var(--pink),#7c5cff,var(--pink));display:grid;place-items:center;font-size:20px}
+h1{font-size:22px;margin:0}h1 small{display:block;font-size:12px;color:var(--mut);font-weight:400}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=text],input[type=password]{flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:12px 14px;font-size:15px;outline:none}
+input[type=text]:focus,input[type=password]:focus{border-color:var(--pink)}
+button{background:var(--pink);color:#2a0f1d;border:0;border-radius:10px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer}
+button.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line);font-weight:500}
+button:disabled{opacity:.5;cursor:wait}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;align-items:center}.chips span{color:var(--mut);font-size:13px;margin-right:4px}
+.chip{background:var(--card2);border:1px solid var(--line);color:var(--mut);padding:5px 12px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;user-select:none}
+.chip.on{background:var(--pink);border-color:var(--pink);color:#2a0f1d}
+.drop{margin-top:12px;border:1.5px dashed var(--line);border-radius:10px;padding:10px;text-align:center;color:var(--mut);font-size:13px}.drop.hl{border-color:var(--pink);color:var(--pink)}
+.err{background:#4a1e28;border:1px solid #8a3344;color:#ffc9d0;border-radius:10px;padding:12px;margin-bottom:16px}
+.warn{background:#41361a;border:1px solid #7a6527;color:#ffe9a6;border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:14px}
+.hero{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.hero h2{margin:0;font-size:20px}.hero p{margin:2px 0 0;color:var(--mut)}
+.big{text-align:right}.big b{font-size:34px;color:var(--pink);letter-spacing:-.5px}.big div{color:var(--mut);font-size:13px}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.stat{background:var(--card2);border-radius:8px;padding:5px 11px;font-size:13px;color:var(--mut)}.stat b{color:var(--tx)}
+h3{margin:0 0 12px;font-size:16px}h3 small{color:var(--mut);font-weight:400;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.sp{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.sp .top{display:flex;justify-content:space-between;font-weight:700}.sp .top span{color:var(--mut);font-weight:500}
+.sp dl{display:grid;grid-template-columns:auto auto;gap:3px 10px;margin:8px 0;font-size:13px}.sp dt{color:var(--mut)}.sp dd{margin:0;text-align:right}
+.bar{height:7px;background:#17121c;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,var(--pink))}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px;min-width:980px}
+th{color:var(--mut);font-weight:500;text-align:left;padding:8px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+td{padding:10px 8px;border-bottom:1px solid #2f2738;white-space:nowrap}tr.pl{cursor:pointer}tr.pl:hover td{background:#2d2536}
+.rk{font-weight:800;color:var(--pink)}.nm{font-weight:600}.nm small{color:var(--mut);font-weight:400;margin-left:4px}.mut{color:var(--mut)}
+.badge{display:inline-block;border-radius:7px;padding:3px 9px;font-weight:800;font-size:12px;letter-spacing:.3px}
+.b-capped{background:#17442a;color:var(--ok)}.b-not{background:#4a2227;color:var(--bad)}.b-over{background:#4a3d14;color:var(--over)}.b-unknown{background:#2e2837;color:var(--na)}
+.steps{margin:0 0 12px;padding-left:20px;color:var(--mut);font-size:14px}.steps b,.steps code{color:var(--tx)}.ok{color:var(--ok);font-size:13px}
+.note{color:var(--mut);font-size:12.5px;margin-top:10px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #2a0f1d55;border-top-color:#2a0f1d;border-radius:50%;animation:r .7s linear infinite;vertical-align:-3px;margin-right:6px}@keyframes r{to{transform:rotate(360deg)}}
+.auth{margin-left:auto;display:flex;align-items:center;gap:10px}.auth img{width:34px;height:34px;border-radius:50%;object-fit:cover}.who{font-weight:700}
+.auth button{padding:8px 14px}a.btn{display:inline-block;background:var(--pink);color:#2a0f1d;border-radius:10px;padding:10px 16px;font-weight:700;text-decoration:none}
+footer{margin-top:30px;text-align:center;color:var(--mut);font-size:13px;padding-bottom:30px}footer a{color:var(--pink)}
+</style></head><body><div class="wrap">
+<header><div class="logo">◎</div><h1>Leeway Calculator<small>Dificultad de spinners · osu!</small></h1><div id="auth" class="auth"></div></header>
+<div id="notice"></div>
+
+<div class="card">
+  <div class="row"><input id="q" type="text" placeholder="ID o link del beatmap (ej. https://osu.ppy.sh/beatmapsets/123#osu/456)" autofocus>
+  <button id="go">Analizar</button><button class="ghost" id="up">Subir .osu</button><input id="file" type="file" accept=".osu" hidden></div>
+  <div class="chips" id="chips"><span>Mods:</span></div>
+  <div class="drop" id="drop">…o arrastra aquí un archivo .osu</div>
+</div>
+<div id="out"></div></div>
+
+<script>
+const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString('en-US');
+const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e};
+const MODS=['HD','HR','DT','NC','EZ','HT','FL','NF'], EXC=[['HR','EZ'],['DT','HT'],['DT','NC'],['NC','HT']];
+let sel=new Set(), osuText=null, auto=true;
+const chips=$('chips');
+function mkChip(label,fn){const c=h('span','chip',label);c.onclick=fn;chips.appendChild(c);return c}
+const autoChip=mkChip('AUTO',()=>{auto=true;sel.clear();paint()});
+const chipEls={};MODS.forEach(m=>chipEls[m]=mkChip(m,()=>{auto=false;if(sel.has(m))sel.delete(m);else{EXC.forEach(p=>{if(p.includes(m))p.forEach(x=>x!==m&&sel.delete(x))});sel.add(m)}if(!sel.size)auto=true;paint()}));
+function paint(){autoChip.classList.toggle('on',auto);MODS.forEach(m=>chipEls[m].classList.toggle('on',sel.has(m)))}
+function setMods(s){sel=new Set((s.match(/../g)||[]).filter(m=>MODS.includes(m)));auto=!sel.size;paint()}paint();
+
+async function run(){
+  const o=$('out'),b=$('go');b.disabled=true;b.innerHTML='<span class="spin"></span>Calculando';o.replaceChildren();
+  try{
+    const r=await fetch('/api/analyze',{method:'POST',body:JSON.stringify({input:$('q').value,osu_text:osuText,mods:auto?'AUTO':[...sel].join('')})});
+    const d=await r.json(); if(d.error) throw new Error(d.error); render(d);
+  }catch(e){const x=h('div','err','⚠ '+e.message);o.appendChild(x)}
+  b.disabled=false;b.textContent='Analizar';
+}
+function render(d){
+  const o=$('out'),m=d.map;
+  if(d.warning)o.appendChild(h('div','warn','ℹ '+d.warning));
+  const c=h('div','card'),hero=h('div','hero'),l=h('div');
+  l.append(h('h2','',m.artist+' – '+m.title),h('p','','['+m.version+'] · mapa de '+m.creator));
+  const bg=h('div','big');bg.append(h('b','',fmt(d.max_score)),h('div','','Max score · '+d.mods+(d.auto?' (mejor combinación)':'')));
+  hero.append(l,bg);c.appendChild(hero);
+  const st=h('div','stats');[['CS',m.cs],['HP',m.hp],['OD',m.od],['Objetos',m.objects],['Spinners',m.spinners],['Drain',m.drain+' s']].forEach(([k,v])=>{const s=h('span','stat',k+' ');s.appendChild(h('b','',v));st.appendChild(s)});
+  c.appendChild(st);o.appendChild(c);
+
+  const sc=h('div','card');sc.appendChild(h('h3','','Spinners')).appendChild(h('small','','con mods '+d.mods));
+  if(!d.spinners.length)sc.appendChild(h('p','mut','Este mapa no tiene spinners.'));
+  const g=h('div','grid');d.spinners.forEach(s=>{
+    const k=h('div','sp'),t=h('div','top');t.append(h('div','','#'+s.n),h('span','',(s.length/1000).toFixed(2)+' s'));
+    const dl=h('dl');[['Rotaciones',s.rotations.toFixed(3)],['Requeridas',s.req],['Bonus',s.amount],['Leeway',s.leeway.toFixed(4)]].forEach(([a,v])=>{dl.append(h('dt','',a),h('dd','',v))});
+    const br=h('div','bar'),i=h('i');i.style.width=Math.min(100,s.leeway/2*100)+'%';br.appendChild(i);k.append(t,dl,br);g.appendChild(k)});
+  sc.appendChild(g);o.appendChild(sc);
+
+  if(d.players.length){
+    const pc=h('div','card');pc.appendChild(h('h3','','Top '+d.players.length+' del ranking')).appendChild(h('small','','clic en un jugador para ver los spinners con sus mods'));
+    const w=h('div','tw'),tb=h('table'),hd=h('tr');
+    ['#','Jugador','Mods','Score','Máx. calculado','Diferencia','Acc','300/100/50/✕','Rot. máx. totales','Giros perdidos ≈','Spin'].forEach(x=>hd.appendChild(h('th','',x)));
+    const th=h('thead');th.appendChild(hd);tb.appendChild(th);const bd=h('tbody');
+    const rows=d.players.slice();if(d.me_score)rows.push(Object.assign({},d.me_score,{me:true}));rows.forEach(p=>{
+      const r=h('tr','pl');r.title='Ver spinners con '+p.mods;if(p.me)r.style.background='#33253f';r.onclick=()=>{setMods(p.mods==='NM'?'':p.mods);run()};
+      const nm=h('td','nm');let nl=h(p.uid?'a':'span','',p.player);if(p.uid){nl.href='https://osu.ppy.sh/users/'+p.uid;nl.target='_blank';nl.rel='noopener';nl.style.color='inherit';nl.onclick=e=>e.stopPropagation()}nm.appendChild(nl);if(p.country)nm.appendChild(h('small','',p.country));nm.appendChild(h('small','',p.grade));
+      const lab={capped:'CAPPED',not:'NOT CAPPED',over:'OVER CAP',unknown:'SIN EVALUAR'}[p.status];
+      const bt=h('td');bt.appendChild(h('span','badge b-'+p.status,lab));
+      const df=p.status==='unknown'?'—':(p.diff>0?'+':'')+fmt(p.diff);
+      [h('td','rk',p.me?('Tú'+(p.rank?' #'+p.rank:'')):p.rank),nm,h('td','',p.mods),h('td','',fmt(p.score)),h('td','mut',fmt(p.max)),h('td','',df),h('td','mut',p.acc),h('td','mut',`${p.n300}/${p.n100}/${p.n50}/${p.miss}`),h('td','',p.rot_total.toFixed(1)+' / '+p.req_total),h('td','',p.lost_est==null?'—':'≈ '+p.lost_est),bt].forEach(x=>r.appendChild(x));
+      bd.appendChild(r)});
+    tb.appendChild(bd);w.appendChild(tb);pc.appendChild(w);
+    o.appendChild(pc)}
+}
+$('go').onclick=()=>{if(!$('q').value.startsWith('📄'))osuText=null;run()};$('q').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
+function readFile(f){if(!f)return;const r=new FileReader();r.onload=()=>{osuText=r.result;$('q').value='📄 '+f.name;run()};r.readAsText(f)}
+$('up').onclick=()=>$('file').click();$('file').onchange=e=>readFile(e.target.files[0]);
+const dr=$('drop');['dragenter','dragover'].forEach(v=>dr.addEventListener(v,e=>{e.preventDefault();dr.classList.add('hl')}));
+['dragleave','drop'].forEach(v=>dr.addEventListener(v,e=>{e.preventDefault();dr.classList.remove('hl')}));dr.addEventListener('drop',e=>readFile(e.dataTransfer.files[0]));
+$('q').addEventListener('input',()=>{if(!$('q').value.startsWith('📄'))osuText=null});
+
+async function loadAuth(){
+  const a=$('auth');a.replaceChildren();
+  try{
+    const me=await (await fetch('/api/me')).json();
+    if(!me.configured)return;
+    if(me.logged_in){
+      const img=h('img');img.src='https://a.ppy.sh/'+me.id;img.alt='';
+      const nm=h('span','who',me.username),out=h('button','ghost','Salir');
+      out.onclick=async()=>{await fetch('/logout',{method:'POST'});location.reload()};
+      a.append(img,nm,out);
+    }else{const l=h('a','btn','Iniciar sesión con osu!');l.href='/login';a.appendChild(l)}
+  }catch(e){}
+}
+loadAuth();
+if(location.search.includes('login_error'))$('notice').appendChild(h('div','err','⚠ No se pudo iniciar sesión con osu!. Intenta de nuevo.'));
+</script>
+<footer>Creado por <a href="https://osu.ppy.sh/users/TheJorgeMC" target="_blank" rel="noopener">TheJorgeMC</a> · no afiliado a ppy</footer></body></html>

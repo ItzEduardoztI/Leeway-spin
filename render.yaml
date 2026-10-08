@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: leeway-spin
+    runtime: python
+    plan: free
+    buildCommand: echo "Sin dependencias"
+    startCommand: python server.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: OSU_CLIENT_ID
+        sync: false
+      - key: OSU_CLIENT_SECRET
+        sync: false
+      - key: BASE_URL
+        sync: false
