@@ -117,7 +117,8 @@ class Beatmap:
         self.hp, self.cs, self.od = g("HPDrainRate", 5), g("CircleSize", 5), g("OverallDifficulty", 5)
         self.slider_mult = float(self.diff.get("SliderMultiplier", 1.4))
         self.tick_rate = float(self.diff.get("SliderTickRate", 1))
-        if not self.objs: raise ValueError("El mapa no tiene hit objects.")
+        self._ms, self._st = {}, {}
+        if not self.objs: raise ValueError("no_objects")
 
     @staticmethod
     def obj_type(t):
@@ -147,9 +148,24 @@ class Beatmap:
         return int(self.objs[-1][2]) - int(self.objs[0][2]) - sum(self.breaks)
 
     def spinners(self):
-        return [(int(o[2]), int(o[5])) for o in self.objs if self.obj_type(o[3]) == 3]
+        """[(inicio, duración, combo acumulado antes del spinner)] - igual que GetSpinners del original."""
+        out, combo = [], 0
+        for o in self.objs:
+            t = self.obj_type(o[3])
+            if t == 0: combo += 1
+            elif t == 1:
+                bl, sv = self.beat_length_at(int(o[2])); slides = int(o[6])
+                combo += self.tick_count(float(o[7]), slides, bl, sv) + slides + 1
+            else:
+                out.append((int(o[2]), int(o[5]) - int(o[2]), combo)); combo += 1
+        return out
 
     def max_score(self, mods):
+        k = tuple(mods)
+        if k not in self._ms: self._ms[k] = self._max_score(mods)
+        return self._ms[k]
+
+    def _max_score(self, mods):
         adj, dm = adjust_time(mods), diff_mod(mods)
         drain = self.drain_ms() // 1000
         density = 16.0 if drain <= 0 else min(max(f32(f32(f32(len(self.objs)) / f32(drain)) * 8), 0.0), 16.0)
@@ -179,15 +195,17 @@ class Beatmap:
         return best
 
     def spinner_table(self, mods):
+        k = tuple(mods)
+        if k in self._st: return self._st[k]
         adj, dm = adjust_time(mods), diff_mod(mods)
         rows = []
-        for i, (s, e) in enumerate(self.spinners(), 1):
-            length = e - s
+        for i, (start, length, combo) in enumerate(self.spinners(), 1):
             rot = calc_rotations(length, adj)
             req = calc_rot_req(length, self.od, dm)
-            rows.append(dict(n=i, start=s, length=length, rotations=round(rot, 5), req=req,
+            rows.append(dict(n=i, start=start, length=length, combo=combo, rotations=round(rot, 5), req=req,
                              amount=calc_amount(int(rot), req),
                              leeway=round(calc_leeway(length, adj, self.od, dm), 5)))
+        self._st[k] = rows
         return rows
 
     def info(self):

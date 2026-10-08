@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Leeway Calculator</title>
 <style>
 :root{--bg:#18141d;--card:#241e2c;--card2:#2d2536;--line:#3a3046;--tx:#f3eef8;--mut:#a99bb8;--pink:#ff66aa;--ok:#5be58a;--bad:#ff6b6b;--over:#ffd35c;--na:#7d7189}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 400px at 15% -10%,#3b1f4d55,transparent),var(--bg);color:var(--tx);font:15px/1.45 "Segoe UI",system-ui,sans-serif}
-.wrap{max-width:1160px;margin:0 auto;padding:22px 16px 60px}
+.wrap{max-width:1160px;margin:0 auto;padding:22px 16px 40px}
 header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
-.logo{width:42px;height:42px;border-radius:50%;background:conic-gradient(var(--pink),#7c5cff,var(--pink));display:grid;place-items:center;font-size:20px}
+.logo{width:42px;height:42px;border-radius:50%;background:conic-gradient(var(--pink),#7c5cff,var(--pink));display:grid;place-items:center;font-size:20px;flex:none}
 h1{font-size:22px;margin:0}h1 small{display:block;font-size:12px;color:var(--mut);font-weight:400}
+.right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.auth{display:flex;align-items:center;gap:10px}.auth img{width:34px;height:34px;border-radius:50%;object-fit:cover}.who{font-weight:700}
+.lang{position:relative}.lang button{padding:9px 12px;font-size:14px;letter-spacing:.5px}.car{font-style:normal;font-size:11px;margin-left:4px;opacity:.8}
+.lang ul{position:absolute;right:0;top:calc(100% + 6px);margin:0;padding:6px;list-style:none;background:#1e2230;border:1px solid #333a50;border-radius:10px;min-width:96px;z-index:20;box-shadow:0 12px 30px #0008}
+.lang li{padding:11px 14px;border-radius:7px;cursor:pointer;font-weight:600;letter-spacing:.5px;color:#d6dbe8}.lang li:hover{background:#2c3350}.lang li.on{color:var(--pink)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-input[type=text],input[type=password]{flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:12px 14px;font-size:15px;outline:none}
-input[type=text]:focus,input[type=password]:focus{border-color:var(--pink)}
+input[type=text]{flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:12px 14px;font-size:15px;outline:none}
+input[type=text]:focus{border-color:var(--pink)}
 button{background:var(--pink);color:#2a0f1d;border:0;border-radius:10px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer}
 button.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line);font-weight:500}
 button:disabled{opacity:.5;cursor:wait}
+a.btn{display:inline-block;background:var(--pink);color:#2a0f1d;border-radius:10px;padding:10px 16px;font-weight:700;text-decoration:none}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;align-items:center}.chips span{color:var(--mut);font-size:13px;margin-right:4px}
 .chip{background:var(--card2);border:1px solid var(--line);color:var(--mut);padding:5px 12px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;user-select:none}
 .chip.on{background:var(--pink);border-color:var(--pink);color:#2a0f1d}
@@ -26,110 +32,141 @@ button:disabled{opacity:.5;cursor:wait}
 .big{text-align:right}.big b{font-size:34px;color:var(--pink);letter-spacing:-.5px}.big div{color:var(--mut);font-size:13px}
 .stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.stat{background:var(--card2);border-radius:8px;padding:5px 11px;font-size:13px;color:var(--mut)}.stat b{color:var(--tx)}
 h3{margin:0 0 12px;font-size:16px}h3 small{color:var(--mut);font-weight:400;margin-left:6px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.sp{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px}
-.sp .top{display:flex;justify-content:space-between;font-weight:700}.sp .top span{color:var(--mut);font-weight:500}
-.sp dl{display:grid;grid-template-columns:auto auto;gap:3px 10px;margin:8px 0;font-size:13px}.sp dt{color:var(--mut)}.sp dd{margin:0;text-align:right}
-.bar{height:7px;background:#17121c;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,var(--pink))}
-.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px;min-width:880px}
-th{color:var(--mut);font-weight:500;text-align:left;padding:8px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
-td{padding:10px 6px;border-bottom:1px solid #2f2738;white-space:nowrap}tr.pl{cursor:pointer}tr.pl:hover td{background:#2d2536}
-.rk{font-weight:800;color:var(--pink)}.nm{font-weight:600}.nm small{color:var(--mut);font-weight:400;margin-left:4px}.mut{color:var(--mut)}
+.tw{overflow:auto;max-height:640px;border-radius:10px}.tw.sp{max-height:460px}
+table{width:100%;border-collapse:collapse;font-size:14px}table.pl{min-width:880px}
+th{color:var(--mut);font-weight:500;text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0;background:var(--card);z-index:1}
+td{padding:9px 8px;border-bottom:1px solid #2f2738;white-space:nowrap}
+th.n,td.n{text-align:right;font-variant-numeric:tabular-nums}
+table.st{width:auto;min-width:620px}table.st th,table.st td{padding:9px 22px 9px 14px;font-variant-numeric:tabular-nums}table.st tr:hover td,tr.pl:hover td{background:#2d2536}
+tr.pl{cursor:pointer}.rk{font-weight:800;color:var(--pink)}.nm{font-weight:600}.nm small{color:var(--mut);font-weight:400;margin-left:6px}.mut{color:var(--mut)}
 .badge{display:inline-block;border-radius:7px;padding:3px 9px;font-weight:800;font-size:12px;letter-spacing:.3px}
 .b-capped{background:#17442a;color:var(--ok)}.b-not{background:#4a2227;color:var(--bad)}.b-over{background:#4a3d14;color:var(--over)}.b-unknown{background:#2e2837;color:var(--na)}
-.steps{margin:0 0 12px;padding-left:20px;color:var(--mut);font-size:14px}.steps b,.steps code{color:var(--tx)}.ok{color:var(--ok);font-size:13px}
-.note{color:var(--mut);font-size:12.5px;margin-top:10px}
 .spin{display:inline-block;width:16px;height:16px;border:2px solid #2a0f1d55;border-top-color:#2a0f1d;border-radius:50%;animation:r .7s linear infinite;vertical-align:-3px;margin-right:6px}@keyframes r{to{transform:rotate(360deg)}}
-.auth{margin-left:auto;display:flex;align-items:center;gap:10px}.auth img{width:34px;height:34px;border-radius:50%;object-fit:cover}.who{font-weight:700}
-.auth button{padding:8px 14px}a.btn{display:inline-block;background:var(--pink);color:#2a0f1d;border-radius:10px;padding:10px 16px;font-weight:700;text-decoration:none}
 footer{margin-top:30px;text-align:center;color:var(--mut);font-size:13px;padding-bottom:30px}footer a{color:var(--pink)}
 </style></head><body><div class="wrap">
-<header><div class="logo">◎</div><h1>Leeway Calculator<small>Dificultad de spinners · osu!</small></h1><div id="auth" class="auth"></div></header>
+<header><div class="logo">◎</div><h1>Leeway Calculator<small data-i="sub"></small></h1>
+  <div class="right">
+    <div class="lang"><button class="ghost" id="langbtn" aria-haspopup="listbox"><span id="langcur">EN</span><i class="car">▼</i></button>
+      <ul id="langmenu" role="listbox" hidden><li data-l="en">EN</li><li data-l="es">ES</li></ul></div>
+    <div id="auth" class="auth"></div>
+  </div>
+</header>
 <div id="notice"></div>
-
 <div class="card">
-  <div class="row"><input id="q" type="text" placeholder="ID o link del beatmap (ej. https://osu.ppy.sh/beatmapsets/123#osu/456)" autofocus>
-  <button id="go">Analizar</button><button class="ghost" id="up">Subir .osu</button><input id="file" type="file" accept=".osu" hidden></div>
-  <div class="chips" id="chips"><span>Mods:</span></div>
-  <div class="drop" id="drop">…o arrastra aquí un archivo .osu</div>
+  <div class="row"><input id="q" type="text" autofocus><button id="go"></button><button class="ghost" id="up" data-i="upload"></button><input id="file" type="file" accept=".osu" hidden></div>
+  <div class="chips" id="chips"><span data-i="mods"></span></div>
+  <div class="drop" id="drop" data-i="drop"></div>
 </div>
 <div id="out"></div></div>
+<footer><span data-i="created"></span> <a href="https://osu.ppy.sh/users/TheJorgeMC" target="_blank" rel="noopener">TheJorgeMC</a></footer>
 
 <script>
-const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString('en-US');
+const L={
+en:{sub:'Spinner difficulty · osu!',ph:'Beatmap ID or link (e.g. https://osu.ppy.sh/beatmapsets/123#osu/456)',analyze:'Analyze',calc:'Calculating',upload:'Upload .osu',mods:'Mods:',drop:'…or drop an .osu file here',
+ mappedby:'mapped by',maxscore:'Max score',best:'best combination',objects:'Objects',spinners:'Spinners',drain:'Drain',withmods:'with mods',nospin:'This beatmap has no spinners.',
+ h_len:'Length (ms)',h_combo:'Combo',h_amount:'Amount (+100)',h_rot:'Rotations',h_req:'Required',h_leeway:'Leeway',
+ top:'Top',hint:'click a player to see the spinners with their mods',p_player:'Player',p_spin:'Spin',p_mods:'Mods',p_score:'Score',p_max:'Max',p_diff:'Diff',p_acc:'Acc',p_hits:'300/100/50/✕',p_rot:'Max rot.',p_lost:'Lost ≈',
+ tt_max:'Max score calculated with their mods',tt_diff:'Player score − calculated max',tt_rot:'Max possible rotations / required rotations (all spinners, with their mods)',tt_lost:'Lost spins (estimate: lost points ÷ 1100)',
+ unrated:'NOT RATED',you:'You',viewspin:'View spinners with',signin:'Sign in with osu!',signout:'Sign out',loginerr:'Could not sign in with osu!.',created:'Created by'},
+es:{sub:'Dificultad de spinners · osu!',ph:'ID o link del beatmap (ej. https://osu.ppy.sh/beatmapsets/123#osu/456)',analyze:'Analizar',calc:'Calculando',upload:'Subir .osu',mods:'Mods:',drop:'…o arrastra aquí un archivo .osu',
+ mappedby:'mapa de',maxscore:'Max score',best:'mejor combinación',objects:'Objetos',spinners:'Spinners',drain:'Drain',withmods:'con mods',nospin:'Este mapa no tiene spinners.',
+ h_len:'Duración (ms)',h_combo:'Combo',h_amount:'Bonus (+100)',h_rot:'Rotaciones',h_req:'Requeridas',h_leeway:'Leeway',
+ top:'Top',hint:'clic en un jugador para ver los spinners con sus mods',p_player:'Jugador',p_spin:'Spin',p_mods:'Mods',p_score:'Score',p_max:'Máx.',p_diff:'Dif.',p_acc:'Acc',p_hits:'300/100/50/✕',p_rot:'Rot. máx.',p_lost:'Giros ≈',
+ tt_max:'Score máximo calculado con sus mods',tt_diff:'Score del jugador − máximo calculado',tt_rot:'Rotaciones máximas posibles / requeridas (todos los spinners, con sus mods)',tt_lost:'Giros perdidos (estimación: puntos perdidos ÷ 1100)',
+ unrated:'SIN EVALUAR',you:'Tú',viewspin:'Ver spinners con',signin:'Iniciar sesión con osu!',signout:'Salir',loginerr:'No se pudo iniciar sesión con osu!.',created:'Creado por'}
+};
+let lang='en';try{const s=localStorage.getItem('lang');if(s&&L[s])lang=s}catch(e){}
+const $=id=>document.getElementById(id),T=k=>L[lang][k];
 const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e};
-const MODS=['HD','HR','DT','NC','EZ','HT','FL','NF'], EXC=[['HR','EZ'],['DT','HT'],['DT','NC'],['NC','HT']];
-let sel=new Set(), osuText=null, auto=true;
+const fmt=n=>Number(n).toLocaleString(lang==='es'?'es-ES':'en-US');
+const dec=(x,d)=>{const s=Number(x).toFixed(d);return lang==='es'?s.replace('.',','):s};
+const MODS=['HD','HR','DT','NC','EZ','HT','FL','NF'],EXC=[['HR','EZ'],['DT','HT'],['DT','NC'],['NC','HT']];
+let sel=new Set(),osuText=null,auto=true,last=null,me=null,loginErr=location.search.includes('login_error');
+
+/* ---------- mods ---------- */
 const chips=$('chips');
 function mkChip(label,fn){const c=h('span','chip',label);c.onclick=fn;chips.appendChild(c);return c}
 const autoChip=mkChip('AUTO',()=>{auto=true;sel.clear();paint()});
 const chipEls={};MODS.forEach(m=>chipEls[m]=mkChip(m,()=>{auto=false;if(sel.has(m))sel.delete(m);else{EXC.forEach(p=>{if(p.includes(m))p.forEach(x=>x!==m&&sel.delete(x))});sel.add(m)}if(!sel.size)auto=true;paint()}));
 function paint(){autoChip.classList.toggle('on',auto);MODS.forEach(m=>chipEls[m].classList.toggle('on',sel.has(m)))}
-function setMods(s){sel=new Set((s.match(/../g)||[]).filter(m=>MODS.includes(m)));auto=!sel.size;paint()}paint();
+function setMods(s){sel=new Set((s.match(/../g)||[]).filter(m=>MODS.includes(m)));auto=!sel.size;paint()}
 
-async function run(){
-  const o=$('out'),b=$('go');b.disabled=true;b.innerHTML='<span class="spin"></span>Calculando';o.replaceChildren();
-  try{
-    const r=await fetch('/api/analyze',{method:'POST',body:JSON.stringify({input:$('q').value,osu_text:osuText,mods:auto?'AUTO':[...sel].join('')})});
-    const d=await r.json(); if(d.error) throw new Error(d.error); render(d);
-  }catch(e){const x=h('div','err','⚠ '+e.message);o.appendChild(x)}
-  b.disabled=false;b.textContent='Analizar';
+/* ---------- idioma ---------- */
+function applyLang(){
+  document.documentElement.lang=lang;$('langcur').textContent=lang.toUpperCase();
+  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=T(e.dataset.i));
+  $('q').placeholder=T('ph');if(!$('go').disabled)$('go').textContent=T('analyze');
+  document.querySelectorAll('#langmenu li').forEach(li=>li.classList.toggle('on',li.dataset.l===lang));
+  paintAuth();paintNotice();if(last)render(last);
 }
+$('langbtn').onclick=e=>{e.stopPropagation();$('langmenu').hidden=!$('langmenu').hidden};
+document.querySelectorAll('#langmenu li').forEach(li=>li.onclick=()=>{lang=li.dataset.l;try{localStorage.setItem('lang',lang)}catch(e){}$('langmenu').hidden=true;applyLang()});
+document.addEventListener('click',()=>{$('langmenu').hidden=true});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('langmenu').hidden=true});
+
+/* ---------- sesión ---------- */
+function paintAuth(){
+  const a=$('auth');a.replaceChildren();if(!me||!me.configured)return;
+  if(me.logged_in){
+    const img=h('img');img.src='https://a.ppy.sh/'+me.id;img.alt='';
+    const out=h('button','ghost',T('signout'));out.onclick=async()=>{await fetch('/logout',{method:'POST'});location.reload()};
+    a.append(img,h('span','who',me.username),out);
+  }else{const l=h('a','btn',T('signin'));l.href='/login';a.appendChild(l)}
+}
+function paintNotice(){const n=$('notice');n.replaceChildren();if(loginErr)n.appendChild(h('div','err','⚠ '+T('loginerr')))}
+(async()=>{try{me=await (await fetch('/api/me')).json()}catch(e){}paintAuth()})();
+
+/* ---------- análisis ---------- */
+async function run(){
+  const o=$('out'),b=$('go');b.disabled=true;b.innerHTML='<span class="spin"></span>'+T('calc');o.replaceChildren();
+  try{
+    const r=await fetch('/api/analyze',{method:'POST',headers:{'X-Lang':lang},body:JSON.stringify({input:$('q').value,osu_text:osuText,mods:auto?'AUTO':[...sel].join('')})});
+    const d=await r.json();if(d.error)throw new Error(d.error);last=d;render(d);
+  }catch(e){last=null;o.appendChild(h('div','err','⚠ '+e.message))}
+  b.disabled=false;b.textContent=T('analyze');
+}
+function table(cls,heads){const w=h('div','tw '+(cls||'')),t=h('table'),hd=h('tr'),th=h('thead');heads.forEach(x=>{const e=h('th',x.n?'n':'',x.t);if(x.tt)e.title=x.tt;hd.appendChild(e)});th.appendChild(hd);t.appendChild(th);const bd=h('tbody');t.appendChild(bd);w.appendChild(t);return{w,t,bd}}
 function render(d){
-  const o=$('out'),m=d.map;
+  const o=$('out'),m=d.map;o.replaceChildren();
   if(d.warning)o.appendChild(h('div','warn','ℹ '+d.warning));
+
   const c=h('div','card'),hero=h('div','hero'),l=h('div');
-  l.append(h('h2','',m.artist+' – '+m.title),h('p','','['+m.version+'] · mapa de '+m.creator));
-  const bg=h('div','big');bg.append(h('b','',fmt(d.max_score)),h('div','','Max score · '+d.mods+(d.auto?' (mejor combinación)':'')));
+  l.append(h('h2','',m.artist+' – '+m.title),h('p','','['+m.version+'] · '+T('mappedby')+' '+m.creator));
+  const bg=h('div','big');bg.append(h('b','',fmt(d.max_score)),h('div','',T('maxscore')+' · '+d.mods+(d.auto?' ('+T('best')+')':'')));
   hero.append(l,bg);c.appendChild(hero);
-  const st=h('div','stats');[['CS',m.cs],['HP',m.hp],['OD',m.od],['Objetos',m.objects],['Spinners',m.spinners],['Drain',m.drain+' s']].forEach(([k,v])=>{const s=h('span','stat',k+' ');s.appendChild(h('b','',v));st.appendChild(s)});
+  const st=h('div','stats');[['CS',m.cs],['HP',m.hp],['OD',m.od],[T('objects'),m.objects],[T('spinners'),m.spinners],[T('drain'),m.drain+' s']].forEach(([k,v])=>{const s=h('span','stat',k+' ');s.appendChild(h('b','',v));st.appendChild(s)});
   c.appendChild(st);o.appendChild(c);
 
-  const sc=h('div','card');sc.appendChild(h('h3','','Spinners')).appendChild(h('small','','con mods '+d.mods));
-  if(!d.spinners.length)sc.appendChild(h('p','mut','Este mapa no tiene spinners.'));
-  const g=h('div','grid');d.spinners.forEach(s=>{
-    const k=h('div','sp'),t=h('div','top');t.append(h('div','','#'+s.n),h('span','',(s.length/1000).toFixed(2)+' s'));
-    const dl=h('dl');[['Rotaciones',s.rotations.toFixed(3)],['Requeridas',s.req],['Bonus',s.amount],['Leeway',s.leeway.toFixed(4)]].forEach(([a,v])=>{dl.append(h('dt','',a),h('dd','',v))});
-    const br=h('div','bar'),i=h('i');i.style.width=Math.min(100,s.leeway/2*100)+'%';br.appendChild(i);k.append(t,dl,br);g.appendChild(k)});
-  sc.appendChild(g);o.appendChild(sc);
+  const sc=h('div','card');sc.appendChild(h('h3','','Spinners')).appendChild(h('small','',T('withmods')+' '+d.mods));
+  if(!d.spinners.length)sc.appendChild(h('p','mut',T('nospin')));
+  else{
+    const tb=table('sp',[{t:'#',n:1},{t:T('h_len'),n:1},{t:T('h_combo'),n:1},{t:T('h_amount')},{t:T('h_rot'),n:1},{t:T('h_req'),n:1},{t:T('h_leeway'),n:1}]);tb.t.classList.add('st');
+    d.spinners.forEach(s=>{const r=h('tr');
+      [[s.n,'n rk'],[s.length,'n'],[s.combo,'n'],[s.amount,''],[dec(s.rotations,5),'n'],[s.req,'n mut'],[dec(s.leeway,5),'n']].forEach(([v,cl])=>r.appendChild(h('td',cl,v)));tb.bd.appendChild(r)});
+    sc.appendChild(tb.w)}
+  o.appendChild(sc);
 
-  if(d.players.length){
-    const pc=h('div','card');pc.appendChild(h('h3','','Top '+d.players.length+' del ranking')).appendChild(h('small','','clic en un jugador para ver los spinners con sus mods'));
-    const w=h('div','tw'),tb=h('table'),hd=h('tr');
-    ['#','Jugador','Spin','Mods','Score','Máx.','Dif.','Acc','300/100/50/✕','Rot. máx.','Giros ≈'].forEach(x=>{const t=h('th','',x);const TT={'Máx.':'Score máximo calculado con sus mods','Dif.':'Score del jugador − máximo calculado','Rot. máx.':'Rotaciones máximas posibles / requeridas (todos los spinners, con sus mods)','Giros ≈':'Giros perdidos (estimación: puntos perdidos ÷ 1100)'};if(TT[x])t.title=TT[x];hd.appendChild(t)});
-    const th=h('thead');th.appendChild(hd);tb.appendChild(th);const bd=h('tbody');
-    const rows=d.players.slice();if(d.me_score)rows.push(Object.assign({},d.me_score,{me:true}));rows.forEach(p=>{
-      const r=h('tr','pl');r.title='Ver spinners con '+p.mods;if(p.me||p.is_me)r.style.background='#33253f';r.onclick=()=>{setMods(p.mods==='NM'?'':p.mods);run()};
-      const nm=h('td','nm');let nl=h(p.uid?'a':'span','',p.player);if(p.uid){nl.href='https://osu.ppy.sh/users/'+p.uid;nl.target='_blank';nl.rel='noopener';nl.style.color='inherit';nl.onclick=e=>e.stopPropagation()}nm.appendChild(nl);if(p.country)nm.appendChild(h('small','',p.country));nm.appendChild(h('small','',p.grade));
-      const lab={capped:'CAPPED',not:'NOT CAPPED',over:'OVER CAP',unknown:'SIN EVALUAR'}[p.status];
-      const bt=h('td');bt.appendChild(h('span','badge b-'+p.status,lab));
+  const rows=d.players.slice();if(d.me_score)rows.push(Object.assign({},d.me_score,{me:true}));
+  if(rows.length){
+    const pc=h('div','card');pc.appendChild(h('h3','',T('top')+' '+d.players.length)).appendChild(h('small','',T('hint')));
+    const tb=table('',[{t:'#'},{t:T('p_player')},{t:T('p_spin')},{t:T('p_mods')},{t:T('p_score'),n:1},{t:T('p_max'),n:1,tt:T('tt_max')},{t:T('p_diff'),n:1,tt:T('tt_diff')},{t:T('p_acc'),n:1},{t:T('p_hits')},{t:T('p_rot'),tt:T('tt_rot')},{t:T('p_lost'),tt:T('tt_lost')}]);tb.t.classList.add('pl');
+    rows.forEach(p=>{
+      const r=h('tr','pl');r.title=T('viewspin')+' '+p.mods;if(p.me||p.is_me)r.style.background='#33253f';
+      r.onclick=()=>{setMods(p.mods==='NM'?'':p.mods);run()};
+      const nm=h('td','nm');let nl=h(p.uid?'a':'span','',p.player);if(p.uid){nl.href='https://osu.ppy.sh/users/'+p.uid;nl.target='_blank';nl.rel='noopener';nl.style.color='inherit';nl.onclick=e=>e.stopPropagation()}
+      nm.appendChild(nl);if(p.country)nm.appendChild(h('small','',p.country));nm.appendChild(h('small','',p.grade));
+      const bt=h('td');bt.appendChild(h('span','badge b-'+p.status,{capped:'CAPPED',not:'NOT CAPPED',over:'OVER CAP',unknown:T('unrated')}[p.status]));
       const df=p.status==='unknown'?'—':(p.diff>0?'+':'')+fmt(p.diff);
-      [h('td','rk',p.me?('Tú'+(p.rank?' #'+p.rank:'')):p.rank),nm,bt,h('td','',p.mods),h('td','',fmt(p.score)),h('td','mut',fmt(p.max)),h('td','',df),h('td','mut',p.acc),h('td','mut',`${p.n300}/${p.n100}/${p.n50}/${p.miss}`),h('td','',p.rot_total.toFixed(1)+' / '+p.req_total),h('td','',p.lost_est==null?'—':'≈ '+p.lost_est)].forEach(x=>r.appendChild(x));
-      bd.appendChild(r)});
-    tb.appendChild(bd);w.appendChild(tb);pc.appendChild(w);
-    o.appendChild(pc)}
+      [h('td','rk',p.me?(T('you')+(p.rank?' #'+p.rank:'')):p.rank),nm,bt,h('td','',p.mods),h('td','n',fmt(p.score)),h('td','n mut',fmt(p.max)),h('td','n',df),h('td','n mut',p.acc),h('td','mut',p.n300+'/'+p.n100+'/'+p.n50+'/'+p.miss),h('td','',dec(p.rot_total,1)+' / '+p.req_total),h('td','',p.lost_est==null?'—':'≈ '+dec(p.lost_est,1))].forEach(x=>r.appendChild(x));
+      tb.bd.appendChild(r)});
+    pc.appendChild(tb.w);o.appendChild(pc)}
 }
+
+/* ---------- entradas ---------- */
 $('go').onclick=()=>{if(!$('q').value.startsWith('📄'))osuText=null;run()};$('q').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
 function readFile(f){if(!f)return;const r=new FileReader();r.onload=()=>{osuText=r.result;$('q').value='📄 '+f.name;run()};r.readAsText(f)}
 $('up').onclick=()=>$('file').click();$('file').onchange=e=>readFile(e.target.files[0]);
 const dr=$('drop');['dragenter','dragover'].forEach(v=>dr.addEventListener(v,e=>{e.preventDefault();dr.classList.add('hl')}));
 ['dragleave','drop'].forEach(v=>dr.addEventListener(v,e=>{e.preventDefault();dr.classList.remove('hl')}));dr.addEventListener('drop',e=>readFile(e.dataTransfer.files[0]));
 $('q').addEventListener('input',()=>{if(!$('q').value.startsWith('📄'))osuText=null});
-
-async function loadAuth(){
-  const a=$('auth');a.replaceChildren();
-  try{
-    const me=await (await fetch('/api/me')).json();
-    if(!me.configured)return;
-    if(me.logged_in){
-      const img=h('img');img.src='https://a.ppy.sh/'+me.id;img.alt='';
-      const nm=h('span','who',me.username),out=h('button','ghost','Salir');
-      out.onclick=async()=>{await fetch('/logout',{method:'POST'});location.reload()};
-      a.append(img,nm,out);
-    }else{const l=h('a','btn','Iniciar sesión con osu!');l.href='/login';a.appendChild(l)}
-  }catch(e){}
-}
-loadAuth();
-if(location.search.includes('login_error'))$('notice').appendChild(h('div','err','⚠ No se pudo iniciar sesión con osu!.'));
-</script>
-<footer>Creado por <a href="https://osu.ppy.sh/users/TheJorgeMC" target="_blank" rel="noopener">TheJorgeMC</a> · no afiliado a ppy</footer></body></html>
+paint();applyLang();
+</script></body></html>

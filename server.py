@@ -18,6 +18,31 @@ CONFIGURED = bool(CLIENT_ID and CLIENT_SECRET)
 INDEX = open(os.path.join(HERE, "index.html"), "rb").read()
 
 
+MSG = {
+    "bad_input": ("Invalid beatmap ID or link.", "ID o link de beatmap no válido."),
+    "map_fail": ("Couldn't download beatmap {id} ({err}).", "No pude descargar el mapa {id} ({err})."),
+    "file_big": ("The .osu file is too large.", "El archivo .osu es demasiado grande."),
+    "no_objects": ("This beatmap has no hit objects.", "El mapa no tiene hit objects."),
+    "bad_file": ("Couldn't read this beatmap.", "No pude leer este mapa."),
+    "no_id": ("This beatmap has no ID, so the ranking can't be loaded.", "Sin ID de beatmap no se puede cargar el ranking."),
+    "rank_na": ("Ranking not available right now.", "Ranking no disponible por ahora."),
+    "rank_err": ("Ranking not available ({err}).", "Ranking no disponible ({err})."),
+    "no_scores": ("This beatmap has no scores in the ranking.", "Este mapa no tiene scores en el ranking."),
+    "origin": ("Origin not allowed.", "Origen no permitido."),
+    "rate": ("Too many requests.", "Demasiadas consultas seguidas."),
+    "generic": ("Something went wrong analyzing this beatmap.", "Algo salió mal al analizar este mapa."),
+}
+
+
+def msg(key, lang, **kw):
+    return MSG[key][1 if lang == "es" else 0].format(**kw)
+
+
+class UserError(Exception):
+    def __init__(self, key, **kw):
+        Exception.__init__(self, key); self.key, self.kw = key, kw
+
+
 class ApiError(Exception):
     def __init__(self, code, msg):
         Exception.__init__(self, "HTTP %s %s" % (code, msg)); self.code = code
@@ -88,7 +113,7 @@ def fetch_map(bid):
                 _maps[bid] = (time.time(), txt); return txt
         except Exception as e:
             err = e
-    raise ValueError("No pude descargar el mapa %d (%s)." % (bid, err))
+    raise UserError("map_fail", id=bid, err=err)
 
 
 def parse_v2(s, rank):
@@ -107,7 +132,7 @@ def parse_v2(s, rank):
                 mods=parse_mods(mods))
 
 
-def top_scores(bid, limit=8):
+def top_scores(bid, limit=50):
     c = _lb.get(bid)
     if c and time.time() - c[0] < 300: return c[1]
     o = json.loads(http("%s/api/v2/beatmaps/%d/scores?mode=osu&type=global&legacy_only=1" % (OSU, bid), token=app_token()))
@@ -133,14 +158,14 @@ def decorate(bm, p):
     p["mods"] = mods_str(p["mods"]); return p
 
 
-def analyze(req, sess):
+def analyze(req, sess, lang="en"):
     text, bid = req.get("osu_text"), None
     q, mods_in = (req.get("input") or "").strip(), (req.get("mods") or "").upper()
     if text:
-        if len(text) > 3_000_000: raise ValueError("El archivo .osu es demasiado grande.")
+        if len(text) > 3_000_000: raise UserError("file_big")
     else:
         m = re.search(r"osu/(\d+)", q) or re.search(r"/b/(\d+)", q) or re.match(r"^\s*(\d+)", q)
-        if not m: raise ValueError("ID o link de beatmap no válido.")
+        if not m: raise UserError("bad_input")
         bid = int(m.group(1))
         tail = re.search(r"([A-Za-z]+)$", q)
         if tail and not mods_in: mods_in = tail.group(1).upper()
@@ -152,14 +177,14 @@ def analyze(req, sess):
     mods = parse_mods(bm.best_combo() if auto else mods_in)
     out = dict(map=bm.info(), beatmap_id=bid, mods=mods_str(mods), auto=auto, max_score=bm.max_score(mods),
                spinners=bm.spinner_table(mods), players=[], me_score=None, warning=None)
-    if not bid: out["warning"] = "Sin ID de beatmap no se puede cargar el ranking."
-    elif not CONFIGURED: out["warning"] = "Ranking no disponible por ahora."
+    if not bid: out["warning"] = msg("no_id", lang)
+    elif not CONFIGURED: out["warning"] = msg("rank_na", lang)
     else:
         try:
             out["players"] = [decorate(bm, p) for p in top_scores(bid)]
-            if not out["players"]: out["warning"] = "Este mapa no tiene scores en el ranking."
+            if not out["players"]: out["warning"] = msg("no_scores", lang)
         except Exception as e:
-            out["warning"] = "Ranking no disponible (%s)." % e
+            out["warning"] = msg("rank_err", lang, err=e)
         if sess:
             mine = [p for p in out["players"] if p.get("uid") == str(sess["id"])]
             if mine: mine[0]["is_me"] = True
@@ -231,26 +256,33 @@ class H(BaseHTTPRequestHandler):
             try: sid = make_session(code)
             except Exception: return self.redirect("/?login_error=1", [self.cookie("st", "", 0)])
             return self.redirect("/", [self.cookie("sid", sid, 30 * 86400), self.cookie("st", "", 0)])
-        self.send(404, "No encontrado", "text/plain")
+        self.send(404, "Not found", "text/plain")
+
+    def lang(self):
+        return "es" if self.headers.get("X-Lang", "en").lower().startswith("es") else "en"
 
     def do_POST(self):
+        lang = self.lang()
         origin = self.headers.get("Origin")
         if origin and urllib.parse.urlparse(origin).netloc != self.headers.get("Host"):
-            return self.send(403, dict(error="Origen no permitido."))
+            return self.send(403, dict(error=msg("origin", lang)))
         if self.path == "/logout":
             try: sid = SimpleCookie(self.headers.get("Cookie", "")).get("sid")
             except Exception: sid = None
             if sid: SESSIONS.pop(sid.value, None)
             return self.send(200, dict(ok=True), headers=[("Set-Cookie", self.cookie("sid", "", 0))])
-        if self.path != "/api/analyze": return self.send(404, dict(error="No encontrado"))
-        if not rate_ok(self.ip()): return self.send(429, dict(error="Demasiadas consultas seguidas. Espera un minuto."))
+        if self.path != "/api/analyze": return self.send(404, dict(error="Not found"))
+        if not rate_ok(self.ip()): return self.send(429, dict(error=msg("rate", lang)))
         try:
             n = min(int(self.headers.get("Content-Length", 0)), 4_000_000)
-            res, code = analyze(json.loads(self.rfile.read(n) or b"{}"), self.session()), 200
-        except Exception as e:
-            res, code = dict(error=str(e)), 400
+            res, code = analyze(json.loads(self.rfile.read(n) or b"{}"), self.session(), lang), 200
+        except UserError as e:
+            res, code = dict(error=msg(e.key, lang, **e.kw)), 400
+        except ValueError as e:
+            res, code = dict(error=msg(str(e) if str(e) in MSG else "bad_file", lang)), 400
+        except Exception:
+            res, code = dict(error=msg("generic", lang)), 400
         self.send(code, res)
-
 
 if __name__ == "__main__":
     srv = ThreadingHTTPServer(("0.0.0.0", PORT), H)
