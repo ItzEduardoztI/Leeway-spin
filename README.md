@@ -1,19 +1,19 @@
 # Leeway Calculator
 
-Calculadora de dificultad de **spinners** para osu!, creada por [TheJorgeMC](https://osu.ppy.sh/users/TheJorgeMC).
+Spinner difficulty calculator for osu!, created by [TheJorgeMC](https://osu.ppy.sh/users/TheJorgeMC).
 
-![Vista previa](docs/vista_previa.png)
-<sub>Vista previa con datos de ejemplo.</sub>
+![Preview](docs/vista_previa.png)
+<sub>Preview with sample data.</sub>
 
-## ¿Qué hace?
+## What does it do?
 
-- Calcula el puntaje máximo de un mapa con cualquier combinación de mods.
-- Muestra, por cada spinner, su duración, combo, rotaciones posibles y requeridas, bonus y leeway.
-- Muestra el top 50 del ranking y si cada jugador capeó los spinners (**CAPPED**, **NOT CAPPED** u **OVER CAP**).
-- Con tu cuenta de osu! también ves tu propio score en ese mapa.
-- Disponible en inglés y español.
+- Calculates a beatmap's max score with any mod combination.
+- Shows, for each spinner, its length, combo, possible and required rotations, bonus and leeway.
+- Shows the top 50 of the leaderboard and whether each player capped the spinners (**CAPPED**, **NOT CAPPED** or **OVER CAP**).
+- If you sign in with your osu! account, you also see your own score on that beatmap.
+- Available in English and Spanish.
 
-## Descargas
+## Downloads
 
-- **Programa para Windows:** [última versión](../../releases/latest) (`LeewayCalculator.exe`)
-- **Versión web:** https://leeway-spin.onrender.com
+- **Windows program:** [latest release](../../releases/latest) (`LeewayCalculator.exe`)
+- **Web version:** https://leeway-spin.onrender.com
